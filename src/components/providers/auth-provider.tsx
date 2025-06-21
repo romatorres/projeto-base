@@ -2,11 +2,11 @@
 
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
-import { useAuthStore } from '@/lib/store/auth-store'
+import { useUserStore } from '@/lib/store/user-store'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
-  const { setUser, setLoading } = useAuthStore()
+  const { setUser, setLoading } = useUserStore()
 
   useEffect(() => {
     setLoading(status === 'loading')

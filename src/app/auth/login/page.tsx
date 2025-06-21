@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import { useAuthStore } from '@/lib/store/auth-store'
+import { useUserStore } from '@/lib/store/user-store'
 
 export default function LoginPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const { setLoading: setAuthLoading } = useAuthStore()
+  const { setLoading: setAuthLoading } = useUserStore()
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()

@@ -3,35 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { UserForm } from "@/components/forms/user-form";
+import { withAdminProtection } from "@/components/hoc/with-admin-protection";
 
-type UserFormData = {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-};
-
-export default function EditUserPage({ params }: { params: { id: string } }) {
-  const [formData, setFormData] = useState<UserFormData>({
-    name: "",
-    email: "",
-    password: "",
-    role: "USER",
-  });
+function EditUserPage({ params }: { params: { id: string } }) {
+  const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  const { user } = useAuthStore();
   const userId = params.id;
-
-  // Verificar se o usuário é admin
-  useEffect(() => {
-    if (user && user.role !== "ADMIN") {
-      router.push("/dashboard");
-      toast.error("Você não tem permissão para acessar esta página");
-    }
-  }, [user, router]);
 
   // Buscar dados do usuário
   useEffect(() => {
@@ -43,12 +22,11 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
           throw new Error("Falha ao buscar dados do usuário");
         }
 
-        const userData = await response.json();
-        setFormData({
-          name: userData.name || "",
-          email: userData.email || "",
-          password: "", // Não preencher a senha por segurança
-          role: userData.role || "USER",
+        const data = await response.json();
+        setUserData({
+          name: data.name || "",
+          email: data.email || "",
+          role: data.role || "USER",
         });
       } catch (error) {
         console.error("Erro:", error);
@@ -61,22 +39,9 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
     fetchUser();
   }, [userId]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
+  const handleSubmit = async (formData: any) => {
     // Preparar dados para envio (remover senha se estiver vazia)
-    const dataToSend: Partial<UserFormData> = { ...formData };
+    const dataToSend: any = { ...formData };
     if (!dataToSend.password) {
       delete dataToSend.password;
     }
@@ -100,8 +65,7 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
     } catch (error) {
       console.error("Erro:", error);
       toast.error("Erro ao atualizar usuário");
-    } finally {
-      setIsSubmitting(false);
+      throw error;
     }
   };
 
@@ -129,98 +93,20 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Nome
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Senha (deixe em branco para manter a atual)
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="mb-6">
-            <label
-              htmlFor="role"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Função
-            </label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="USER">Usuário</option>
-              <option value="ADMIN">Administrador</option>
-            </select>
-          </div>
-
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="mr-2 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
-              disabled={isSubmitting}
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Salvando..." : "Salvar"}
-            </button>
-          </div>
-        </form>
+        <UserForm
+          initialData={userData}
+          onSubmit={handleSubmit}
+          submitLabel="Salvar"
+          submitLoadingLabel="Salvando..."
+          showRoleField={true}
+          passwordRequired={false}
+          passwordLabel="Senha (deixe em branco para manter a atual)"
+          showCancelButton={true}
+          onCancel={() => router.back()}
+        />
       </div>
     </div>
   );
 }
+
+export default withAdminProtection(EditUserPage);

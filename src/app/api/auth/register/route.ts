@@ -1,42 +1,30 @@
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
+import { NextRequest, NextResponse } from "next/server";
+import { userService } from "@/lib/services/user-service";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
-    const { name, email, password } = data;
 
-    if (!name || !email || !password) {
-      return NextResponse.json({ error: "Dados inválidos" }, { status: 400 });
+    // Validação básica
+    if (!data.name || !data.email || !data.password) {
+      return NextResponse.json(
+        { error: "Dados incompletos" },
+        { status: 400 }
+      );
     }
 
-    const userExists = await prisma.user.findUnique({
-      where: { email },
+    // Criar usuário com role USER por padrão
+    const user = await userService.create({
+      ...data,
+      role: "USER",
     });
 
-    if (userExists) {
-      return NextResponse.json({ error: "Usuário já existe" }, { status: 400 });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
-    });
-
+    return NextResponse.json(user);
+  } catch (error: any) {
+    console.error("Erro ao registrar usuário:", error);
     return NextResponse.json(
-      { message: "Usuário criado com sucesso" },
-      { status: 201 }
-    );
-  } catch {
-    return NextResponse.json(
-      { error: "Erro interno do servidor" },
-      { status: 500 }
+      { error: error.message || "Erro ao registrar usuário" },
+      { status: 400 }
     );
   }
 }

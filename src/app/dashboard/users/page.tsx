@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { useUserStore } from "@/lib/store/user-store";
 
 type User = {
   id: string;
@@ -18,7 +18,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user } = useUserStore();
 
   // Redirecionar se não for admin
   useEffect(() => {
@@ -161,7 +161,7 @@ export default function UsersPage() {
                   <button
                     onClick={() => handleDeleteUser(user.id)}
                     className="text-red-600 hover:text-red-900"
-                    disabled={user.id === useAuthStore.getState().user?.id}
+                    disabled={user.id === useUserStore.getState().user?.id}
                   >
                     Excluir
                   </button>
