@@ -34,3 +34,34 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## ABOUT THE SYSTEM
+
+- Resumo do Sitema e Recursos Reutilizáveis
+
+## 1. Gerenciamento de Estado com Zustand
+
+Implementamos um store centralizado com Zustand ( useUserStore ) que combina autenticação e permissões:
+
+### Principais recursos do useUserStore
+
+- Estado do usuário : user , isLoading , isAuthenticated
+- Permissões : hasPermission(permission) - verifica se o usuário tem uma permissão específica
+- Ações : setUser() , setLoading() , logout()
+- Persistência : O estado é automaticamente salvo no localStorage
+
+## 2. Componente Reutilizável UserForm
+
+Criamos um componente de formulário reutilizável para operações relacionadas a usuários
+
+## 3. Controle de Permissões com PermissionGate
+
+Implementamos um componente para controle declarativo de permissões
+
+## 4. Proteção de Rotas com HOC
+
+Implementamos um Higher-Order Component para proteger rotas no lado do cliente
+
+## 5. Middlewares para APIs
+
+Implementamos middlewares para proteger rotas de API
