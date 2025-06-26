@@ -95,7 +95,7 @@ export default function UsersPage() {
   return (
     <Container>
       <ContainerTitle
-        className="mb-6"
+        className=""
         buttonLabel="Novo Usuário"
         buttonProps={{
           onClick: () => router.push("/dashboard/users/new"),

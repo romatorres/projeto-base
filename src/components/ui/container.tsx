@@ -30,16 +30,19 @@ export function ContainerTitle({
   ...props
 }: ContainerTitleProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4">
+    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-6 mb-6">
       <h3
-        className={cn("text-lg md:text-xl font-semibold", className)}
+        className={cn(
+          "text-lg md:text-xl font-semibold h-full flex items-center",
+          className
+        )}
         {...props}
       >
         {children}
       </h3>
       {buttonLabel && (
         <button
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 w-full md:w-auto"
           {...props.buttonProps}
         >
           {buttonLabel}
